@@ -1,0 +1,519 @@
+{
+  "workflows": {
+    "WF-9BE35B48": {
+      "workflow_id": "WF-9BE35B48",
+      "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+      "requested_by": "test_user",
+      "status": "failed",
+      "created_at": "2026-08-31T20:19:42.123403+00:00",
+      "updated_at": "2026-08-31T20:19:43.862837+00:00",
+      "progress": 100,
+      "context": {
+        "entity": "supplier_ABC"
+      },
+      "tasks": [
+        "TASK-824F371A",
+        "TASK-61640FDF",
+        "TASK-82BB7D56",
+        "TASK-C25BA276"
+      ],
+      "plan": [
+        {
+          "agent_id": "data-intelligence-agent-v1",
+          "title": "Collect and validate supplier evidence"
+        },
+        {
+          "agent_id": "risk-analysis-agent-v1",
+          "title": "Calculate supplier risk score"
+        },
+        {
+          "agent_id": "security-compliance-agent-v1",
+          "title": "Check policies and sensitive data"
+        },
+        {
+          "agent_id": "report-generation-agent-v1",
+          "title": "Generate executive recommendation"
+        }
+      ],
+      "output": {},
+      "completed_at": "2026-08-31T20:19:43.862837+00:00",
+      "memory_updated": true,
+      "id": "WF-9BE35B48"
+    },
+    "WF-4537E948": {
+      "workflow_id": "WF-4537E948",
+      "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+      "requested_by": "test_user",
+      "status": "failed",
+      "created_at": "2026-08-31T20:20:16.851517+00:00",
+      "updated_at": "2026-08-31T20:20:20.904448+00:00",
+      "progress": 100,
+      "context": {
+        "entity": "supplier_ABC"
+      },
+      "tasks": [
+        "TASK-97656CF0",
+        "TASK-BADF4ED0",
+        "TASK-E5811D89",
+        "TASK-BB9173EA"
+      ],
+      "plan": [
+        {
+          "agent_id": "data-intelligence-agent-v1",
+          "title": "Collect and validate supplier evidence"
+        },
+        {
+          "agent_id": "risk-analysis-agent-v1",
+          "title": "Calculate supplier risk score"
+        },
+        {
+          "agent_id": "security-compliance-agent-v1",
+          "title": "Check policies and sensitive data"
+        },
+        {
+          "agent_id": "report-generation-agent-v1",
+          "title": "Generate executive recommendation"
+        }
+      ],
+      "output": {},
+      "completed_at": "2026-08-31T20:20:20.904448+00:00",
+      "memory_updated": true,
+      "id": "WF-4537E948"
+    }
+  },
+  "tasks": {
+    "TASK-824F371A": {
+      "task_id": "TASK-824F371A",
+      "workflow_id": "WF-9BE35B48",
+      "agent_id": "data-intelligence-agent-v1",
+      "title": "Collect and validate supplier evidence",
+      "status": "failed",
+      "started_at": "2026-08-31T20:19:43.517899+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {}
+      },
+      "retries": 0,
+      "error": "agent_identity_unavailable",
+      "completed_at": "2026-08-31T20:19:43.532773+00:00",
+      "execution_time_ms": 18,
+      "id": "TASK-824F371A"
+    },
+    "TASK-61640FDF": {
+      "task_id": "TASK-61640FDF",
+      "workflow_id": "WF-9BE35B48",
+      "agent_id": "risk-analysis-agent-v1",
+      "title": "Calculate supplier risk score",
+      "status": "failed",
+      "started_at": "2026-08-31T20:19:43.572073+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {}
+      },
+      "retries": 0,
+      "error": "agent_identity_unavailable",
+      "completed_at": "2026-08-31T20:19:43.607084+00:00",
+      "execution_time_ms": 37,
+      "id": "TASK-61640FDF"
+    },
+    "TASK-82BB7D56": {
+      "task_id": "TASK-82BB7D56",
+      "workflow_id": "WF-9BE35B48",
+      "agent_id": "security-compliance-agent-v1",
+      "title": "Check policies and sensitive data",
+      "status": "failed",
+      "started_at": "2026-08-31T20:19:43.645179+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {}
+      },
+      "retries": 0,
+      "error": "agent_identity_unavailable",
+      "completed_at": "2026-08-31T20:19:43.676453+00:00",
+      "execution_time_ms": 33,
+      "id": "TASK-82BB7D56"
+    },
+    "TASK-C25BA276": {
+      "task_id": "TASK-C25BA276",
+      "workflow_id": "WF-9BE35B48",
+      "agent_id": "report-generation-agent-v1",
+      "title": "Generate executive recommendation",
+      "status": "failed",
+      "started_at": "2026-08-31T20:19:43.721151+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {}
+      },
+      "retries": 0,
+      "error": "agent_identity_unavailable",
+      "completed_at": "2026-08-31T20:19:43.762773+00:00",
+      "execution_time_ms": 46,
+      "id": "TASK-C25BA276"
+    },
+    "TASK-97656CF0": {
+      "task_id": "TASK-97656CF0",
+      "workflow_id": "WF-4537E948",
+      "agent_id": "data-intelligence-agent-v1",
+      "title": "Collect and validate supplier evidence",
+      "status": "failed",
+      "started_at": "2026-08-31T20:20:17.675104+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {
+          "entity": "supplier_ABC",
+          "previous_analysis": "Workflow completed with specialist outputs.",
+          "previous_decisions": [
+            "Supplier risk assessment completed"
+          ],
+          "last_updated": "2026-08-31T20:19:43.818832+00:00",
+          "workflow_id": "WF-9BE35B48",
+          "id": "supplier_ABC"
+        }
+      },
+      "retries": 0,
+      "error": "quota_exceeded",
+      "completed_at": "2026-08-31T20:20:18.458938+00:00",
+      "execution_time_ms": 787,
+      "id": "TASK-97656CF0"
+    },
+    "TASK-BADF4ED0": {
+      "task_id": "TASK-BADF4ED0",
+      "workflow_id": "WF-4537E948",
+      "agent_id": "risk-analysis-agent-v1",
+      "title": "Calculate supplier risk score",
+      "status": "failed",
+      "started_at": "2026-08-31T20:20:18.487569+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {
+          "entity": "supplier_ABC",
+          "previous_analysis": "Workflow completed with specialist outputs.",
+          "previous_decisions": [
+            "Supplier risk assessment completed"
+          ],
+          "last_updated": "2026-08-31T20:19:43.818832+00:00",
+          "workflow_id": "WF-9BE35B48",
+          "id": "supplier_ABC"
+        }
+      },
+      "retries": 0,
+      "error": "quota_exceeded",
+      "completed_at": "2026-08-31T20:20:19.279680+00:00",
+      "execution_time_ms": 795,
+      "id": "TASK-BADF4ED0"
+    },
+    "TASK-E5811D89": {
+      "task_id": "TASK-E5811D89",
+      "workflow_id": "WF-4537E948",
+      "agent_id": "security-compliance-agent-v1",
+      "title": "Check policies and sensitive data",
+      "status": "failed",
+      "started_at": "2026-08-31T20:20:19.306725+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {
+          "entity": "supplier_ABC",
+          "previous_analysis": "Workflow completed with specialist outputs.",
+          "previous_decisions": [
+            "Supplier risk assessment completed"
+          ],
+          "last_updated": "2026-08-31T20:19:43.818832+00:00",
+          "workflow_id": "WF-9BE35B48",
+          "id": "supplier_ABC"
+        }
+      },
+      "retries": 0,
+      "error": "quota_exceeded",
+      "completed_at": "2026-08-31T20:20:19.991288+00:00",
+      "execution_time_ms": 687,
+      "id": "TASK-E5811D89"
+    },
+    "TASK-BB9173EA": {
+      "task_id": "TASK-BB9173EA",
+      "workflow_id": "WF-4537E948",
+      "agent_id": "report-generation-agent-v1",
+      "title": "Generate executive recommendation",
+      "status": "failed",
+      "started_at": "2026-08-31T20:20:20.018289+00:00",
+      "input": {
+        "goal": "Analyze supplier risk for ABC Logistics before vendor onboarding.",
+        "memory": {
+          "entity": "supplier_ABC",
+          "previous_analysis": "Workflow completed with specialist outputs.",
+          "previous_decisions": [
+            "Supplier risk assessment completed"
+          ],
+          "last_updated": "2026-08-31T20:19:43.818832+00:00",
+          "workflow_id": "WF-9BE35B48",
+          "id": "supplier_ABC"
+        }
+      },
+      "retries": 0,
+      "error": "quota_exceeded",
+      "completed_at": "2026-08-31T20:20:20.850940+00:00",
+      "execution_time_ms": 835,
+      "id": "TASK-BB9173EA"
+    }
+  },
+  "audit_logs": {
+    "audit-2026-08-31T201943532773+0000-data-intelligence-agent-v1": {
+      "agent": "data-intelligence-agent-v1",
+      "action": "Collect and validate supplier evidence",
+      "timestamp": "2026-08-31T20:19:43.532773+00:00",
+      "status": "failed",
+      "workflow_id": "WF-9BE35B48",
+      "tools_used": [],
+      "detail": {
+        "error": "agent_identity_unavailable"
+      },
+      "input_hash": "1d6970cd737e7aed1678ae2586eb4e92a200f096dace1d9afa4b346ba8bd1d3e",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T201943532773+0000-data-intelligence-agent-v1"
+    },
+    "audit-2026-08-31T201943607084+0000-risk-analysis-agent-v1": {
+      "agent": "risk-analysis-agent-v1",
+      "action": "Calculate supplier risk score",
+      "timestamp": "2026-08-31T20:19:43.607084+00:00",
+      "status": "failed",
+      "workflow_id": "WF-9BE35B48",
+      "tools_used": [],
+      "detail": {
+        "error": "agent_identity_unavailable"
+      },
+      "input_hash": "1d6970cd737e7aed1678ae2586eb4e92a200f096dace1d9afa4b346ba8bd1d3e",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T201943607084+0000-risk-analysis-agent-v1"
+    },
+    "audit-2026-08-31T201943676453+0000-security-compliance-agent-v1": {
+      "agent": "security-compliance-agent-v1",
+      "action": "Check policies and sensitive data",
+      "timestamp": "2026-08-31T20:19:43.676453+00:00",
+      "status": "failed",
+      "workflow_id": "WF-9BE35B48",
+      "tools_used": [],
+      "detail": {
+        "error": "agent_identity_unavailable"
+      },
+      "input_hash": "1d6970cd737e7aed1678ae2586eb4e92a200f096dace1d9afa4b346ba8bd1d3e",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T201943676453+0000-security-compliance-agent-v1"
+    },
+    "audit-2026-08-31T201943762773+0000-report-generation-agent-v1": {
+      "agent": "report-generation-agent-v1",
+      "action": "Generate executive recommendation",
+      "timestamp": "2026-08-31T20:19:43.762773+00:00",
+      "status": "failed",
+      "workflow_id": "WF-9BE35B48",
+      "tools_used": [],
+      "detail": {
+        "error": "agent_identity_unavailable"
+      },
+      "input_hash": "1d6970cd737e7aed1678ae2586eb4e92a200f096dace1d9afa4b346ba8bd1d3e",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T201943762773+0000-report-generation-agent-v1"
+    },
+    "audit-2026-08-31T201943839859+0000-memory-bank": {
+      "agent": "memory-bank",
+      "action": "updated_supplier_context",
+      "timestamp": "2026-08-31T20:19:43.839859+00:00",
+      "status": "success",
+      "workflow_id": "WF-9BE35B48",
+      "tools_used": [],
+      "detail": {},
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T201943839859+0000-memory-bank"
+    },
+    "audit-2026-08-31T202018458938+0000-data-intelligence-agent-v1": {
+      "agent": "data-intelligence-agent-v1",
+      "action": "Collect and validate supplier evidence",
+      "timestamp": "2026-08-31T20:20:18.458938+00:00",
+      "status": "failed",
+      "workflow_id": "WF-4537E948",
+      "tools_used": [],
+      "detail": {
+        "error": "quota_exceeded"
+      },
+      "input_hash": "01c7fb0f4a6ae3b9da31cd319204ea00ca4a409373f08180e3d391606e8fc0c8",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T202018458938+0000-data-intelligence-agent-v1"
+    },
+    "audit-2026-08-31T202019279680+0000-risk-analysis-agent-v1": {
+      "agent": "risk-analysis-agent-v1",
+      "action": "Calculate supplier risk score",
+      "timestamp": "2026-08-31T20:20:19.279680+00:00",
+      "status": "failed",
+      "workflow_id": "WF-4537E948",
+      "tools_used": [],
+      "detail": {
+        "error": "quota_exceeded"
+      },
+      "input_hash": "01c7fb0f4a6ae3b9da31cd319204ea00ca4a409373f08180e3d391606e8fc0c8",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T202019279680+0000-risk-analysis-agent-v1"
+    },
+    "audit-2026-08-31T202019991288+0000-security-compliance-agent-v1": {
+      "agent": "security-compliance-agent-v1",
+      "action": "Check policies and sensitive data",
+      "timestamp": "2026-08-31T20:20:19.991288+00:00",
+      "status": "failed",
+      "workflow_id": "WF-4537E948",
+      "tools_used": [],
+      "detail": {
+        "error": "quota_exceeded"
+      },
+      "input_hash": "01c7fb0f4a6ae3b9da31cd319204ea00ca4a409373f08180e3d391606e8fc0c8",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T202019991288+0000-security-compliance-agent-v1"
+    },
+    "audit-2026-08-31T202020850940+0000-report-generation-agent-v1": {
+      "agent": "report-generation-agent-v1",
+      "action": "Generate executive recommendation",
+      "timestamp": "2026-08-31T20:20:20.850940+00:00",
+      "status": "failed",
+      "workflow_id": "WF-4537E948",
+      "tools_used": [],
+      "detail": {
+        "error": "quota_exceeded"
+      },
+      "input_hash": "01c7fb0f4a6ae3b9da31cd319204ea00ca4a409373f08180e3d391606e8fc0c8",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T202020850940+0000-report-generation-agent-v1"
+    },
+    "audit-2026-08-31T202020893449+0000-memory-bank": {
+      "agent": "memory-bank",
+      "action": "updated_supplier_context",
+      "timestamp": "2026-08-31T20:20:20.893449+00:00",
+      "status": "success",
+      "workflow_id": "WF-4537E948",
+      "tools_used": [],
+      "detail": {},
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "output_summary": "",
+      "latency": null,
+      "id": "audit-2026-08-31T202020893449+0000-memory-bank"
+    }
+  },
+  "memories": {
+    "supplier_ABC": {
+      "entity": "supplier_ABC",
+      "previous_analysis": "Workflow completed with specialist outputs.",
+      "previous_decisions": [
+        "Supplier risk assessment completed"
+      ],
+      "last_updated": "2026-08-31T20:20:20.882441+00:00",
+      "workflow_id": "WF-4537E948",
+      "id": "supplier_ABC"
+    }
+  },
+  "agents": {
+    "data-intelligence-agent-v1": {
+      "agent_id": "data-intelligence-agent-v1",
+      "name": "Data Intelligence Agent",
+      "version": "1.0",
+      "owner": "Data Department",
+      "description": "Checks enterprise datasets for quality and anomalies.",
+      "capabilities": [
+        "data_validation",
+        "anomaly_detection"
+      ],
+      "tools": [
+        "bigquery",
+        "python_analysis"
+      ],
+      "permissions": {
+        "analytics_data": true,
+        "customer_data": false
+      },
+      "status": "approved",
+      "role": "specialist",
+      "enabled": true,
+      "created_at": "2026-08-31T20:20:16.872507+00:00",
+      "updated_at": "2026-08-31T20:20:16.872507+00:00",
+      "id": "data-intelligence-agent-v1"
+    },
+    "security-compliance-agent-v1": {
+      "agent_id": "security-compliance-agent-v1",
+      "name": "Security Compliance Agent",
+      "version": "1.0",
+      "owner": "Security Department",
+      "description": "Validates policy, sensitive data, and unsafe requests.",
+      "capabilities": [
+        "pii_detection",
+        "policy_validation"
+      ],
+      "tools": [
+        "model_armor",
+        "policy_engine"
+      ],
+      "permissions": {
+        "policies": true,
+        "customer_data": false
+      },
+      "status": "approved",
+      "role": "specialist",
+      "enabled": true,
+      "created_at": "2026-08-31T20:20:16.898939+00:00",
+      "updated_at": "2026-08-31T20:20:16.898939+00:00",
+      "id": "security-compliance-agent-v1"
+    },
+    "risk-analysis-agent-v1": {
+      "agent_id": "risk-analysis-agent-v1",
+      "name": "Risk Analysis Agent",
+      "version": "1.0",
+      "owner": "Finance Department",
+      "description": "Scores supplier risk using evidence and historical context.",
+      "capabilities": [
+        "risk_scoring",
+        "recommendations"
+      ],
+      "tools": [
+        "bigquery",
+        "firestore_memory"
+      ],
+      "permissions": {
+        "analytics_data": true,
+        "customer_data": false
+      },
+      "status": "approved",
+      "role": "specialist",
+      "enabled": true,
+      "created_at": "2026-08-31T20:20:16.926606+00:00",
+      "updated_at": "2026-08-31T20:20:16.926606+00:00",
+      "id": "risk-analysis-agent-v1"
+    },
+    "report-generation-agent-v1": {
+      "agent_id": "report-generation-agent-v1",
+      "name": "Report Generation Agent",
+      "version": "1.0",
+      "owner": "Operations Department",
+      "description": "Creates executive recommendations from specialist outputs.",
+      "capabilities": [
+        "executive_reporting"
+      ],
+      "tools": [
+        "gemini",
+        "firestore"
+      ],
+      "permissions": {
+        "reports": true,
+        "analytics_data": true
+      },
+      "status": "approved",
+      "role": "specialist",
+      "enabled": true,
+      "created_at": "2026-08-31T20:20:16.951225+00:00",
+      "updated_at": "2026-08-31T20:20:16.951225+00:00",
+      "id": "report-generation-agent-v1"
+    }
+  }
+}

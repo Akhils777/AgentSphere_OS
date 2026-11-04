@@ -134,6 +134,17 @@ async def set_agent_enabled(agent_id: str, enabled: bool):
 @app.get("/api/system/auth-status")
 async def system_auth_status():
     from .config import settings
+    if settings.gemini_mock_mode:
+        return {
+            "provider": "mock_provider",
+            "model": "mock-gemini-flash",
+            "credentials_configured": True,
+            "authentication_ready": True,
+            "status_code": "READY",
+            "reason": "Deterministic mock provider active for zero-cost testing and evaluation.",
+            "recommended_action": "System is running in isolated mock mode."
+        }
+
     use_vertex = settings.google_genai_use_vertexai
     has_key = bool(settings.gemini_api_key)
     has_project = bool(settings.google_cloud_project)

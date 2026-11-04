@@ -1,4 +1,5 @@
 from .base import GeminiReasoner
+from ..registry.agent_registry import registry
 
 
 class SupervisorAgent(GeminiReasoner):
@@ -13,12 +14,24 @@ class SupervisorAgent(GeminiReasoner):
             """
         )
 
-    async def plan(self, goal: str, available_agents: list[dict]) -> list[dict]:
+    @staticmethod
+    def validate_candidate_agent(agent_id: str) -> tuple[bool, str | None]:
+        """Validate candidate agent against the live registry without hardcoded whitelists."""
+        agent = registry.get(agent_id)
+        if not agent:
+            return False, "agent_not_found_in_registry"
+        if not agent.get("enabled", True):
+            return False, "agent_disabled"
+        if agent.get("status") != "approved":
+            return False, f"agent_not_approved (status={agent.get('status')})"
+        return True, None
 
+    async def plan(self, goal: str, available_agents: list[dict]) -> list[dict]:
+        # Filter available agent IDs from registry
         available_ids = [
             a.get("agent_id")
             for a in available_agents
-            if a.get("agent_id")
+            if a.get("agent_id") and a.get("enabled", True) and a.get("status") == "approved"
         ]
 
         result = await self.reason(
@@ -28,59 +41,52 @@ class SupervisorAgent(GeminiReasoner):
             }
         )
 
-        print("SUPERVISOR RESULT:", result)
+        rejection_reasons = []
 
-        allowed_agents = {
-            "data-intelligence-agent-v1",
-            "risk-analysis-agent-v1",
-            "security-compliance-agent-v1",
-            "report-generation-agent-v1",
-        }
-
-        # Validate Gemini generated plan
+        # Validate Gemini-generated plan using registry metadata
         if isinstance(result, dict) and isinstance(result.get("plan"), list):
-
             valid_plan = []
-
             for step in result["plan"]:
-
                 if not isinstance(step, dict):
+                    rejection_reasons.append({"step": step, "reason": "step_must_be_dict"})
                     continue
 
                 agent_id = step.get("agent_id")
+                if not agent_id:
+                    rejection_reasons.append({"step": step, "reason": "missing_agent_id"})
+                    continue
 
-                if agent_id in allowed_agents:
-                    valid_plan.append(
-                        {
-                            "agent_id": agent_id,
-                            "title": step.get(
-                                "title",
-                                "Execute agent task"
-                            )
-                        }
-                    )
+                is_valid, reason = self.validate_candidate_agent(agent_id)
+                if is_valid:
+                    valid_plan.append({
+                        "agent_id": agent_id,
+                        "title": step.get("title", "Execute agent task")
+                    })
+                else:
+                    rejection_reasons.append({"agent_id": agent_id, "reason": reason})
 
-            # Only use Gemini plan if all agents are valid
             if valid_plan:
+                if rejection_reasons:
+                    print(f"[SupervisorAgent] Valid plan constructed; some steps discarded with reasons: {rejection_reasons}")
                 return valid_plan
+            elif rejection_reasons:
+                print(f"[SupervisorAgent] Discarded invalid plan. Reasons: {rejection_reasons}")
 
-
-        # Safe fallback plan
-        return [
-            {
-                "agent_id": "data-intelligence-agent-v1",
-                "title": "Collect and validate supplier evidence",
-            },
-            {
-                "agent_id": "risk-analysis-agent-v1",
-                "title": "Calculate supplier risk score",
-            },
-            {
-                "agent_id": "security-compliance-agent-v1",
-                "title": "Check policies and sensitive data",
-            },
-            {
-                "agent_id": "report-generation-agent-v1",
-                "title": "Generate executive recommendation",
-            },
+        # Safe registry-validated fallback plan preserving existing default workflow behavior
+        default_specialists = [
+            ("data-intelligence-agent-v1", "Collect and validate supplier evidence"),
+            ("risk-analysis-agent-v1", "Calculate supplier risk score"),
+            ("security-compliance-agent-v1", "Check policies and sensitive data"),
+            ("report-generation-agent-v1", "Generate executive recommendation"),
         ]
+
+        fallback_plan = []
+        for agent_id, default_title in default_specialists:
+            is_valid, _ = self.validate_candidate_agent(agent_id)
+            if is_valid:
+                fallback_plan.append({
+                    "agent_id": agent_id,
+                    "title": default_title
+                })
+
+        return fallback_plan

@@ -8,7 +8,7 @@ from .config import settings
 class Store:
     """Firestore in production, durable JSON locally for zero-cost development."""
 
-    def __init__(self):
+    def __init__(self, data_file: str | Path | None = None):
         self._lock = Lock()
         self.client = None
         try:
@@ -17,7 +17,15 @@ class Store:
                 self.client = firestore.Client(project=settings.google_cloud_project, database=settings.firestore_database)
         except Exception:
             self.client = None
-        self.path = Path(settings.local_data_file)
+
+        target = data_file or settings.local_data_file
+        target_path = Path(target)
+        if target_path.is_absolute():
+            self.path = target_path.resolve()
+        else:
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            self.path = (repo_root / target_path).resolve()
+
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
             self.path.write_text(json.dumps({}), encoding="utf-8")
@@ -57,4 +65,3 @@ class Store:
 
 
 store = Store()
-

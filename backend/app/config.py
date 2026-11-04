@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     gemini_timeout_seconds: float = 45.0
     gemini_max_retries: int = 2
     cors_origins: str = "http://localhost:5173"
+    gemini_mock_mode: bool = False
 
     model_config = SettingsConfigDict(env_file=(".env", "backend/.env"), env_file_encoding="utf-8", extra="ignore")
 
 
 settings = Settings()
-

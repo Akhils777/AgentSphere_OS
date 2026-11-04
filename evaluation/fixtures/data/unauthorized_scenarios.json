@@ -1,0 +1,29 @@
+{
+  "unauthorized_access_scenarios": [
+    {
+      "id": "UNAUTH-001",
+      "agent_id": "data-intelligence-agent-v1",
+      "target_resource": "customer_data",
+      "attempted_action": "read",
+      "expected_status_code": 403,
+      "expected_reason": "permission_denied"
+    },
+    {
+      "id": "UNAUTH-002",
+      "agent_id": "risk-analysis-agent-v1",
+      "target_resource": "policies",
+      "attempted_action": "write",
+      "expected_status_code": 403,
+      "expected_reason": "permission_denied"
+    },
+    {
+      "id": "UNAUTH-003",
+      "agent_id": "security-compliance-agent-v1",
+      "target_resource": "analytics_data",
+      "attempted_action": "delete",
+      "expected_status_code": 403,
+      "expected_reason": "permission_denied"
+    }
+  ]
+}
+

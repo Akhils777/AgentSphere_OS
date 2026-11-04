@@ -1,0 +1,64 @@
+{
+  "normal_transactions": [
+    {
+      "transaction_id": "TXN-1001",
+      "amount_usd": 15200.0,
+      "date": "2026-01-15",
+      "type": "invoice_payment",
+      "currency": "USD",
+      "counterparty": "Apex Parts",
+      "status": "settled"
+    },
+    {
+      "transaction_id": "TXN-1002",
+      "amount_usd": 28450.5,
+      "date": "2026-02-10",
+      "type": "wire_transfer",
+      "currency": "USD",
+      "counterparty": "Global Logistics",
+      "status": "settled"
+    },
+    {
+      "transaction_id": "TXN-1003",
+      "amount_usd": 9400.0,
+      "date": "2026-03-01",
+      "type": "service_fee",
+      "currency": "USD",
+      "counterparty": "Cloud Compute Corp",
+      "status": "settled"
+    }
+  ],
+  "anomalous_transactions": [
+    {
+      "transaction_id": "TXN-9001",
+      "amount_usd": -84000.0,
+      "date": "2026-02-28",
+      "type": "negative_debit_anomaly",
+      "currency": "USD",
+      "counterparty": "Unknown Entity",
+      "anomaly_type": "negative_value",
+      "status": "flagged"
+    },
+    {
+      "transaction_id": "TXN-9002",
+      "amount_usd": 1250000.0,
+      "date": "2026-03-02",
+      "type": "sudden_spike",
+      "currency": "USD",
+      "counterparty": "Offshore Account 887",
+      "anomaly_type": "volume_spike_100x",
+      "status": "flagged"
+    },
+    {
+      "transaction_id": "TXN-9003",
+      "amount_usd": 45000.0,
+      "date": "2026-03-03",
+      "type": "round_tripping",
+      "currency": "USD",
+      "counterparty": "Self-Owned Shell Corp",
+      "anomaly_type": "round_trip_wash",
+      "status": "flagged"
+    }
+  ]
+}
+

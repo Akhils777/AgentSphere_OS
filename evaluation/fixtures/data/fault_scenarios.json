@@ -1,0 +1,33 @@
+{
+  "fault_scenarios": [
+    {
+      "id": "FAULT-QUOTA-01",
+      "fault_type": "quota_exceeded",
+      "target_step": "security-compliance-agent-v1",
+      "is_recoverable": false,
+      "injected_error_code": "quota_exceeded",
+      "expected_workflow_status": "failed",
+      "expected_memory_behavior": "skip_memory_update_on_failure"
+    },
+    {
+      "id": "FAULT-TIMEOUT-02",
+      "fault_type": "transient_timeout",
+      "target_step": "data-intelligence-agent-v1",
+      "is_recoverable": true,
+      "max_retries": 1,
+      "injected_error_code": "model_timeout",
+      "expected_workflow_status": "completed",
+      "expected_task_retries": 1
+    },
+    {
+      "id": "FAULT-UNAVAILABLE-03",
+      "fault_type": "model_unavailable",
+      "target_step": "risk-analysis-agent-v1",
+      "is_recoverable": false,
+      "injected_error_code": "model_unavailable",
+      "expected_workflow_status": "failed",
+      "expected_memory_behavior": "skip_memory_update_on_failure"
+    }
+  ]
+}
+

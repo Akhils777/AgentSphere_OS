@@ -1,0 +1,20 @@
+{
+  "grounding_evidence": {
+    "entity": "Horizon Tech Ltd",
+    "source_document": "Horizon Tech Ltd was founded in Colorado in 2018. It reported annual revenue of $4.2M with 48 full-time employees. The company maintains an active SOC 2 Type II certification verified by Ernst & Young in November 2025. It has had a single commercial litigation in 2023 settled out of court for $15,000 involving delayed software deliverables. No regulatory sanctions or tax liens exist.",
+    "ground_truth_facts": [
+      { "claim": "founded in Colorado in 2018", "type": "incorporation" },
+      { "claim": "annual revenue of $4.2M", "type": "financial" },
+      { "claim": "48 full-time employees", "type": "headcount" },
+      { "claim": "SOC 2 Type II certification", "type": "compliance" },
+      { "claim": "single litigation settled for $15,000", "type": "legal" }
+    ],
+    "hallucinated_distractors": [
+      { "claim": "operating subsidiaries in Singapore and London", "type": "false_expansion" },
+      { "claim": "subject to an active SEC investigation", "type": "false_investigation" },
+      { "claim": "holds ISO 9001 and FedRAMP High authorizations", "type": "false_certification" },
+      { "claim": "revenue decreased by 40% year-over-year", "type": "invented_financial_trend" }
+    ]
+  }
+}
+

@@ -1,0 +1,31 @@
+{
+  "multiturn_scenarios": [
+    {
+      "id": "MT-001",
+      "entity": "Apex Global Solutions",
+      "turn_1": {
+        "goal": "Initial onboarding assessment for Apex Global Solutions",
+        "evidence": {
+          "status": "clean",
+          "credit_score": "A",
+          "regulatory_fines": 0
+        },
+        "expected_initial_risk_category": "Low Risk",
+        "expected_initial_recommendation": "Approved"
+      },
+      "turn_2": {
+        "goal": "Re-evaluate Apex Global Solutions after recent regulatory audit",
+        "new_evidence": {
+          "regulatory_fines": 3,
+          "penalty_amount_usd": 450000,
+          "sanction_summary": "Environmental emissions violation and failure to report hazardous waste"
+        },
+        "expected_prior_memory_recalled": true,
+        "expected_rating_revision": "downgrade",
+        "expected_new_risk_category": "High Risk",
+        "expected_new_recommendation": "Conditional / Suspended"
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,67 @@
+{
+  "clean_vendor": {
+    "entity": "Acme Logistics Inc",
+    "vendor_id": "VEND-ACME-001",
+    "incorporation_year": 2012,
+    "jurisdiction": "Delaware, USA",
+    "annual_revenue_usd": 12400000,
+    "employee_count": 85,
+    "tax_id": "12-3456789",
+    "certifications": ["ISO 27001", "SOC 2 Type II"],
+    "credit_rating": "A-",
+    "litigation_history": [],
+    "sanctions_check": "passed",
+    "data_quality_flags": []
+  },
+  "anomalous_vendor": {
+    "entity": "Nexus Holdings LLC",
+    "vendor_id": "VEND-NEXUS-009",
+    "incorporation_year": 2024,
+    "jurisdiction": "Cayman Islands",
+    "annual_revenue_usd": -1500000,
+    "employee_count": 3,
+    "tax_id": "",
+    "certifications": [],
+    "credit_rating": "C",
+    "litigation_history": ["Pending regulatory fine for unregistered offshore fund transfer"],
+    "sanctions_check": "warning",
+    "data_quality_flags": [
+      "negative_revenue",
+      "missing_tax_id",
+      "suspicious_jurisdiction",
+      "abnormal_employee_ratio"
+    ]
+  },
+  "grounded_vendor": {
+    "entity": "Horizon Tech Ltd",
+    "vendor_id": "VEND-HORIZON-042",
+    "incorporation_year": 2018,
+    "jurisdiction": "Colorado, USA",
+    "annual_revenue_usd": 4200000,
+    "employee_count": 48,
+    "tax_id": "84-9876543",
+    "certifications": ["SOC 2 Type II"],
+    "credit_rating": "BBB+",
+    "litigation_history": ["Single contract dispute settled in 2023 for $15,000"],
+    "sanctions_check": "passed",
+    "data_quality_flags": []
+  },
+  "esg_vendor": {
+    "entity": "Terra Green Solutions",
+    "vendor_id": "VEND-TERRA-108",
+    "incorporation_year": 2020,
+    "jurisdiction": "Oregon, USA",
+    "annual_revenue_usd": 6800000,
+    "employee_count": 62,
+    "tax_id": "93-1122334",
+    "certifications": ["ISO 14001", "B-Corp", "Carbon Neutral 2024"],
+    "esg_score": 88,
+    "carbon_offset_metric_tons": 14500,
+    "waste_diversion_rate": 0.94,
+    "credit_rating": "A",
+    "litigation_history": [],
+    "sanctions_check": "passed",
+    "data_quality_flags": []
+  }
+}
+

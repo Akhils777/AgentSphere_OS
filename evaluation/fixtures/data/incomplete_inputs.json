@@ -1,0 +1,31 @@
+{
+  "incomplete_inputs": [
+    {
+      "id": "INCOMP-001",
+      "name": "Missing Entity Context",
+      "goal": "Perform general supplier check and compliance review",
+      "context": {},
+      "expected_entity": null,
+      "expected_memory_action": "skip_memory_update_no_entity"
+    },
+    {
+      "id": "INCOMP-002",
+      "name": "Whitespace Entity Context",
+      "goal": "Audit vendor operations",
+      "context": {
+        "entity": "   "
+      },
+      "expected_entity": null,
+      "expected_memory_action": "skip_memory_update_no_entity"
+    },
+    {
+      "id": "INCOMP-003",
+      "name": "Empty Context Payload",
+      "goal": "Verify supplier documentation",
+      "context": null,
+      "expected_entity": null,
+      "expected_memory_action": "skip_memory_update_no_entity"
+    }
+  ]
+}
+

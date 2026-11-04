@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     gemini_mock_mode: bool = False
 
+    # Workflow runtime resilience & transient retry settings
+    workflow_max_retries: int = 2
+    workflow_retry_initial_delay_ms: int = 50
+    workflow_retry_backoff_multiplier: float = 2.0
+    workflow_fast_retry_in_mock: bool = True
+
     model_config = SettingsConfigDict(env_file=(".env", "backend/.env"), env_file_encoding="utf-8", extra="ignore")
 
 

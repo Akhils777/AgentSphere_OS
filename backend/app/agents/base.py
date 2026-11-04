@@ -1,6 +1,7 @@
 import asyncio
 import json
 from ..config import settings
+from ..evidence import EvidenceExtractor, EvidenceEnvelope, GroundingVerifier
 
 try:
     from google import genai
@@ -85,7 +86,47 @@ class GeminiReasoner:
                 plan.append({"agent_id": "report-generation-agent-v1", "title": "Generate executive recommendation"})
             return {"status": "success", "model": "mock-gemini-flash", "plan": plan}
 
+        entity = context.get("entity") or "Unknown Entity"
+        source_doc = context.get("source_document")
+        gt_facts = context.get("ground_truth_facts")
+
         if self.name == "data-intelligence-agent":
+            if source_doc or gt_facts:
+                extractor = EvidenceExtractor()
+                envelope = extractor.extract(source_doc, entity=entity, ground_truth_facts=gt_facts)
+
+                inc_fact = envelope.get_fact("incorporation")
+                fin_fact = envelope.get_fact("financial")
+                hc_fact = envelope.get_fact("headcount")
+                cert_fact = envelope.get_fact("compliance")
+                legal_fact = envelope.get_fact("legal")
+
+                parts = [f"Corporate records for {entity} validated"]
+                if inc_fact:
+                    parts.append(inc_fact.claim)
+                if fin_fact:
+                    parts.append(fin_fact.claim)
+                if hc_fact:
+                    parts.append(hc_fact.claim)
+                if cert_fact:
+                    parts.append(cert_fact.claim)
+                if legal_fact:
+                    parts.append(legal_fact.claim)
+
+                findings_str = ". ".join(parts) + "."
+
+                return {
+                    "status": "success",
+                    "model": "mock-gemini-flash",
+                    "task": task,
+                    "data_quality": "verified",
+                    "evidence_envelope": envelope.to_dict(),
+                    "extracted_facts_count": len(envelope.facts),
+                    "missing_values": envelope.missing_fields,
+                    "anomalies": [c["description"] for c in envelope.contradictions],
+                    "findings": findings_str,
+                }
+
             return {
                 "status": "success",
                 "model": "mock-gemini-flash",
@@ -97,6 +138,22 @@ class GeminiReasoner:
             }
 
         if self.name == "risk-analysis-agent":
+            prior_data = (context.get("prior_outputs") or {}).get("data-intelligence-agent-v1", {})
+            env_data = context.get("evidence_envelope") or prior_data.get("evidence_envelope")
+            if env_data:
+                envelope = EvidenceEnvelope.from_dict(env_data)
+                legal_fact = envelope.get_fact("legal")
+                legal_desc = f"Legal record: {legal_fact.claim}." if legal_fact else "Zero adverse regulatory sanctions."
+                return {
+                    "status": "success",
+                    "model": "mock-gemini-flash",
+                    "task": task,
+                    "risk_score": 18,
+                    "risk_category": "Low Risk",
+                    "confidence": "high",
+                    "key_findings": f"Stable operational history for {entity}. Low regulatory and legal risk confirmed. {legal_desc}",
+                }
+
             return {
                 "status": "success",
                 "model": "mock-gemini-flash",
@@ -108,6 +165,21 @@ class GeminiReasoner:
             }
 
         if self.name == "security-compliance-agent":
+            prior_data = (context.get("prior_outputs") or {}).get("data-intelligence-agent-v1", {})
+            env_data = context.get("evidence_envelope") or prior_data.get("evidence_envelope")
+            if env_data:
+                envelope = EvidenceEnvelope.from_dict(env_data)
+                cert_fact = envelope.get_fact("compliance")
+                cert_desc = f"Active {cert_fact.claim} verified." if cert_fact else "Policy compliance verified."
+                return {
+                    "status": "success",
+                    "model": "mock-gemini-flash",
+                    "task": task,
+                    "safe": True,
+                    "policy_violations": [],
+                    "findings": f"Full policy adherence confirmed for {entity}; {cert_desc} No PII or sensitive data leaks detected.",
+                }
+
             return {
                 "status": "success",
                 "model": "mock-gemini-flash",
@@ -118,6 +190,62 @@ class GeminiReasoner:
             }
 
         if self.name == "report-generation-agent":
+            prior_data = (context.get("prior_outputs") or {}).get("data-intelligence-agent-v1", {})
+            env_data = context.get("evidence_envelope") or prior_data.get("evidence_envelope")
+            if not env_data and (source_doc or gt_facts):
+                extractor = EvidenceExtractor()
+                env_obj = extractor.extract(source_doc, entity=entity, ground_truth_facts=gt_facts)
+                env_data = env_obj.to_dict()
+
+            if env_data:
+                envelope = EvidenceEnvelope.from_dict(env_data)
+                inc_fact = envelope.get_fact("incorporation")
+                fin_fact = envelope.get_fact("financial")
+                hc_fact = envelope.get_fact("headcount")
+                cert_fact = envelope.get_fact("compliance")
+                legal_fact = envelope.get_fact("legal")
+
+                assessment_sentences = [f"Executive Assessment for {entity}."]
+                if inc_fact:
+                    assessment_sentences.append(f"{entity} was {inc_fact.claim}.")
+                if fin_fact and hc_fact:
+                    assessment_sentences.append(f"It reported {fin_fact.claim} with {hc_fact.claim}.")
+                elif fin_fact:
+                    assessment_sentences.append(f"It reported {fin_fact.claim}.")
+                elif hc_fact:
+                    assessment_sentences.append(f"It maintains a workforce of {hc_fact.claim}.")
+
+                if cert_fact:
+                    assessment_sentences.append(f"The company maintains an active {cert_fact.claim}.")
+                if legal_fact:
+                    assessment_sentences.append(f"Legal and regulatory records confirm {legal_fact.claim.rstrip('.')}.")
+                else:
+                    assessment_sentences.append("No regulatory sanctions or tax liens exist.")
+
+                assessment_sentences.append("Recommendation: Proceed with vendor onboarding based strictly on verified records.")
+                full_analysis = " ".join(assessment_sentences)
+
+                verifier = GroundingVerifier()
+                v_res = verifier.verify_report(full_analysis, envelope)
+
+                return {
+                    "status": "success",
+                    "model": "mock-gemini-flash",
+                    "task": task,
+                    "analysis": full_analysis,
+                    "executive_summary": {
+                        "status": "Approved",
+                        "recommendation": "Proceed with vendor onboarding. Low risk profile verified strictly against source records.",
+                        "risk_score": 18,
+                        "risk_category": "Low Risk",
+                        "confidence_score": 95,
+                        "grounding_status": v_res["status"],
+                        "verified_claims_count": v_res["verified_claims_count"],
+                        "unsupported_claims_count": v_res["unsupported_claims_count"],
+                    },
+                    "grounding_verification": v_res,
+                }
+
             return {
                 "status": "success",
                 "model": "mock-gemini-flash",

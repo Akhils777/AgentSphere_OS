@@ -13,6 +13,7 @@ from ..registry.agent_registry import registry
 from ..security_filters import inspect_input
 from ..storage import store
 from ..gateway.policy_engine import authorize
+from .retry_policy import RetryPolicy, is_transient_error, classify_error
 
 AGENTS = {
     "data-intelligence-agent-v1": DataIntelligenceAgent(),
@@ -92,12 +93,18 @@ class WorkflowEngine:
         store.upsert("workflows", workflow_id, workflow)
 
         outputs, failed = {}, False
+        last_error = None
         # Do not silently default missing entity identifiers to "supplier_ABC"
         raw_entity = (workflow.get("context") or {}).get("entity")
         entity = str(raw_entity).strip() if raw_entity else None
         recalled = memory_bank.recall(entity) if entity else None
 
+        policy = RetryPolicy()
+
         for index, step in enumerate(plan):
+            if failed:
+                break
+
             agent_id = step.get("agent_id", "")
             task_id = f"TASK-{uuid4().hex[:8].upper()}"
             started = time.perf_counter()
@@ -131,19 +138,91 @@ class WorkflowEngine:
                     "prior_outputs": outputs,
                     **(workflow.get("context") or {})
                 }
-                result = await AGENTS[agent_id].reason(step.get("title", workflow["goal"]), step_context)
+                # Propagate structured evidence envelope if extracted by data intelligence specialist
+                if "data-intelligence-agent-v1" in outputs and "evidence_envelope" in outputs["data-intelligence-agent-v1"]:
+                    step_context["evidence_envelope"] = outputs["data-intelligence-agent-v1"]["evidence_envelope"]
 
-                if result.get("status") == "error":
-                    err_code = result.get("error_code", "gemini_error")
-                    raise RuntimeError(err_code)
+                retries_done = 0
+                max_retries = policy.max_retries
 
-                outputs[agent_id] = result
-                task.update(status="completed", output=result, completed_at=now_iso())
-                audit(agent_id, step.get("title", "completed_task"), "success", workflow_id, [resource], {"model": result.get("model")})
-            except Exception as error:
+                while retries_done <= max_retries:
+                    try:
+                        result = await AGENTS[agent_id].reason(step.get("title", workflow["goal"]), step_context)
+
+                        if isinstance(result, dict) and result.get("status") == "error":
+                            err_code = result.get("error_code", "gemini_error")
+                            raise RuntimeError(err_code)
+
+                        outputs[agent_id] = result
+                        task.update(status="completed", output=result, retries=retries_done, completed_at=now_iso())
+                        if retries_done > 0:
+                            audit(
+                                agent_id,
+                                "task_transient_retry_recovered",
+                                "recovered",
+                                workflow_id,
+                                detail={"attempts_required": retries_done, "final_status": "success"},
+                            )
+                        audit(agent_id, step.get("title", "completed_task"), "success", workflow_id, [resource], {"model": result.get("model")})
+                        break
+                    except Exception as step_err:
+                        is_transient = is_transient_error(step_err)
+                        err_category = classify_error(step_err)
+
+                        if is_transient and retries_done < max_retries:
+                            retries_done += 1
+                            task["retries"] = retries_done
+                            delay_sec = policy.calculate_delay(retries_done)
+                            audit(
+                                agent_id,
+                                "task_transient_retry",
+                                "retry_scheduled",
+                                workflow_id,
+                                detail={
+                                    "attempt": retries_done,
+                                    "max_retries": max_retries,
+                                    "delay_sec": delay_sec,
+                                    "error_type": err_category,
+                                    "error_message": str(step_err),
+                                },
+                            )
+                            if delay_sec > 0:
+                                await asyncio.sleep(delay_sec)
+                        else:
+                            failed = True
+                            last_error = str(step_err)
+                            task.update(status="failed", error=str(step_err), retries=retries_done, completed_at=now_iso())
+                            audit(
+                                agent_id or "unknown-agent",
+                                "task_retry_decision",
+                                "retries_exhausted" if is_transient else "aborted",
+                                workflow_id,
+                                detail={
+                                    "attempts": retries_done,
+                                    "max_retries": max_retries,
+                                    "error_type": err_category,
+                                    "error_message": str(step_err),
+                                },
+                            )
+                            audit(agent_id or "unknown-agent", step.get("title", "task"), "failed", workflow_id, detail={"error": str(step_err)})
+                            break
+
+            except Exception as setup_err:
                 failed = True
-                task.update(status="failed", error=str(error), completed_at=now_iso())
-                audit(agent_id or "unknown-agent", step.get("title", "task"), "failed", workflow_id, detail={"error": str(error)})
+                last_error = str(setup_err)
+                task.update(status="failed", error=str(setup_err), retries=0, completed_at=now_iso())
+                audit(
+                    agent_id or "unknown-agent",
+                    "task_retry_decision",
+                    "aborted",
+                    workflow_id,
+                    detail={
+                        "attempts": 0,
+                        "error_type": classify_error(setup_err),
+                        "error_message": str(setup_err),
+                    },
+                )
+                audit(agent_id or "unknown-agent", step.get("title", "task"), "failed", workflow_id, detail={"error": str(setup_err)})
 
             task["execution_time_ms"] = round((time.perf_counter() - started) * 1000)
             store.upsert("tasks", task_id, task)
@@ -170,13 +249,16 @@ class WorkflowEngine:
                 audit("memory-bank", "skip_memory_update_no_entity", "skipped", workflow_id, detail={"reason": "no_entity_specified"})
             memory_updated = False
 
-        workflow.update(
-            status="failed" if failed else "completed",
-            output=outputs,
-            completed_at=now_iso(),
-            updated_at=now_iso(),
-            memory_updated=memory_updated
-        )
+        workflow_update = {
+            "status": "failed" if failed else "completed",
+            "output": outputs,
+            "completed_at": now_iso(),
+            "updated_at": now_iso(),
+            "memory_updated": memory_updated,
+        }
+        if failed and last_error:
+            workflow_update["error"] = last_error
+        workflow.update(**workflow_update)
         store.upsert("workflows", workflow_id, workflow)
 
     def get(self, workflow_id: str):

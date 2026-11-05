@@ -66,6 +66,7 @@ class EvaluationSandbox:
         self._orig_store_path = store.path
         self._orig_store_client = store.client
         self._orig_mock_mode = settings.gemini_mock_mode
+        self._orig_model_name = settings.gemini_model
 
         # 3. Create isolated temporary directory and store file
         self._temp_dir = tempfile.TemporaryDirectory(prefix="agentsphere_eval_")
@@ -79,6 +80,8 @@ class EvaluationSandbox:
         # 5. Apply mock or live mode based on config (mock is default)
         is_mock = self.config.mode == EvaluationMode.MOCK
         settings.gemini_mock_mode = is_mock
+        if not is_mock and self.config.model_name and not self.config.model_name.startswith("mock-"):
+            settings.gemini_model = self.config.model_name
 
         # 6. Apply deterministic seed for reproducibility
         if self.config.seed is not None:
@@ -97,6 +100,8 @@ class EvaluationSandbox:
             store.client = self._orig_store_client
         if self._orig_mock_mode is not None:
             settings.gemini_mock_mode = self._orig_mock_mode
+        if getattr(self, "_orig_model_name", None) is not None:
+            settings.gemini_model = self._orig_model_name
         if self._orig_data_file is not None:
             settings.local_data_file = self._orig_data_file
 

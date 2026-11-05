@@ -61,6 +61,11 @@ class ExecutionTrace(BaseModel):
     captured_outputs: dict[str, Any] = Field(default_factory=dict)
     execution_time_ms: float = 0.0
     error: str | None = None
+    token_usage: dict[str, Any] | None = None
+    cost_inr: float = 0.0
+    cost_usd: float = 0.0
+    model_name: str | None = None
+    provider: str | None = None
 
 
 class StructuralResult(BaseModel):
@@ -107,6 +112,11 @@ class TaskEvaluationResult(BaseModel):
     final_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Final graded score (0.0 if structural failed)")
     execution_time_ms: float = 0.0
     trace: ExecutionTrace | None = None
+    token_usage: dict[str, Any] | None = None
+    cost_inr: float = 0.0
+    cost_usd: float = 0.0
+    model_name: str | None = None
+    provider: str | None = None
 
     @model_validator(mode="after")
     def enforce_structural_override(self) -> "TaskEvaluationResult":
@@ -145,4 +155,8 @@ class BenchmarkReport(BaseModel):
     config: EvaluationConfig = Field(description="Configuration settings active for this benchmark run")
     metrics: EvaluationMetrics = Field(description="Summary metrics across the benchmark suite")
     task_results: list[TaskEvaluationResult] = Field(default_factory=list, description="Per-task evaluation outcomes")
+    total_tokens: int | None = None
+    cost_inr: float = 0.0
+    cost_usd: float = 0.0
+    provider: str = "mock_provider"
 

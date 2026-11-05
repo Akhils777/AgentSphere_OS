@@ -80,6 +80,8 @@ class EvaluationConfig(BaseModel):
         if self.mode == EvaluationMode.MOCK and not self.model_name.startswith("mock-"):
             # Normalize to mock prefix if not explicitly overridden
             self.model_name = f"mock-{self.model_name}"
+        elif self.mode == EvaluationMode.LIVE and self.model_name.startswith("mock-"):
+            self.model_name = "gemini-3.5-flash"
 
         return self
 

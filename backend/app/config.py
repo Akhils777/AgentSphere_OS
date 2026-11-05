@@ -8,11 +8,11 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     firestore_database: str = "(default)"
     local_data_file: str = ".data/agentsphere.json"
-    gemini_model: str = "gemini-flash-latest"
+    gemini_model: str = "gemini-3.5-flash"
     gemini_timeout_seconds: float = 45.0
     gemini_max_retries: int = 2
     cors_origins: str = "http://localhost:5173"
-    gemini_mock_mode: bool = False
+    gemini_mock_mode: bool = True
 
     # Workflow runtime resilience & transient retry settings
     workflow_max_retries: int = 2

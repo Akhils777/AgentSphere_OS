@@ -1,4 +1,5 @@
 from .base import GeminiReasoner
+from .capability_matcher import CapabilityMatcher
 from ..registry.agent_registry import registry
 
 
@@ -6,12 +7,12 @@ class SupervisorAgent(GeminiReasoner):
     def __init__(self):
         super().__init__(
             "supervisor-orchestrator-agent",
-            """
-            You are a supervisor for a governed multi-agent enterprise workflow.
-            Select only approved specialist agents.
-            Produce an ordered execution plan.
-            Each step must contain a valid agent_id from the provided available agents.
-            """
+            """You are a supervisor for a governed multi-agent enterprise workflow.
+Select only approved specialist agents from the provided available agents.
+Produce an ordered execution plan.
+Format your response as a valid JSON object:
+{"plan": [{"agent_id": "...", "title": "..."}]}
+Each step must contain a valid agent_id from the provided available_agents list."""
         )
 
     @staticmethod
@@ -37,7 +38,8 @@ class SupervisorAgent(GeminiReasoner):
         result = await self.reason(
             goal,
             {
-                "available_agents": available_ids
+                "available_agents": available_ids,
+                "available_agent_records": available_agents,
             }
         )
 
@@ -72,21 +74,12 @@ class SupervisorAgent(GeminiReasoner):
             elif rejection_reasons:
                 print(f"[SupervisorAgent] Discarded invalid plan. Reasons: {rejection_reasons}")
 
-        # Safe registry-validated fallback plan preserving existing default workflow behavior
-        default_specialists = [
-            ("data-intelligence-agent-v1", "Collect and validate supplier evidence"),
-            ("risk-analysis-agent-v1", "Calculate supplier risk score"),
-            ("security-compliance-agent-v1", "Check policies and sensitive data"),
-            ("report-generation-agent-v1", "Generate executive recommendation"),
-        ]
-
-        fallback_plan = []
-        for agent_id, default_title in default_specialists:
-            is_valid, _ = self.validate_candidate_agent(agent_id)
+        # Fallback to dynamic capability matcher validating candidate agents against live registry
+        fallback_plan = CapabilityMatcher.match_plan(goal, available_agents)
+        valid_fallback = []
+        for step in fallback_plan:
+            is_valid, _ = self.validate_candidate_agent(step["agent_id"])
             if is_valid:
-                fallback_plan.append({
-                    "agent_id": agent_id,
-                    "title": default_title
-                })
+                valid_fallback.append(step)
 
-        return fallback_plan
+        return valid_fallback

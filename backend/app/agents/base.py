@@ -5,8 +5,10 @@ from ..evidence import EvidenceExtractor, EvidenceEnvelope, GroundingVerifier
 
 try:
     from google import genai
+    from google.genai import types
 except ImportError:
     genai = None
+    types = None
 
 
 def get_adk_agent_class():
@@ -54,6 +56,8 @@ class GeminiReasoner:
     @staticmethod
     def _error_code(error: Exception) -> str:
         text = str(error).lower()
+        if any(val in text for val in ("billing", "payment", "card", "billing account")):
+            return "billing_required"
         if isinstance(error, (TimeoutError, asyncio.TimeoutError)) or "timeout" in text:
             return "api_timeout"
         if any(value in text for value in ("401", "403", "400", "unauthenticated", "permission denied", "api key", "api_key_invalid", "defaultcredentialserror", "invalid_argument")):
@@ -74,16 +78,9 @@ class GeminiReasoner:
             return {"status": "success", "model": "mock-gemini-flash", **context["mock_response"]}
 
         if self.name == "supervisor-orchestrator-agent":
-            available = context.get("available_agents", [])
-            plan = []
-            if "data-intelligence-agent-v1" in available or not available:
-                plan.append({"agent_id": "data-intelligence-agent-v1", "title": "Collect and validate supplier evidence"})
-            if "risk-analysis-agent-v1" in available or not available:
-                plan.append({"agent_id": "risk-analysis-agent-v1", "title": "Calculate supplier risk score"})
-            if "security-compliance-agent-v1" in available or not available:
-                plan.append({"agent_id": "security-compliance-agent-v1", "title": "Check policies and sensitive data"})
-            if "report-generation-agent-v1" in available or not available:
-                plan.append({"agent_id": "report-generation-agent-v1", "title": "Generate executive recommendation"})
+            from .capability_matcher import CapabilityMatcher
+            records = context.get("available_agent_records") or context.get("available_agents", [])
+            plan = CapabilityMatcher.match_plan(task, records)
             return {"status": "success", "model": "mock-gemini-flash", "plan": plan}
 
         entity = context.get("entity") or "Unknown Entity"
@@ -284,16 +281,25 @@ class GeminiReasoner:
             return genai.Client(api_key=settings.gemini_api_key)
 
         models_to_try = [settings.gemini_model]
-        if settings.gemini_model not in ("gemini-flash-latest", "gemini-2.5-flash"):
-            models_to_try.append("gemini-flash-latest")
+        if settings.gemini_model not in ("gemini-3.5-flash", "gemini-3.1-flash-lite"):
+            models_to_try.append("gemini-3.5-flash")
 
         last_error = None
         for model_name in models_to_try:
             for attempt in range(settings.gemini_max_retries + 1):
                 try:
                     client = call()
+                    config = (
+                        types.GenerateContentConfig(response_mime_type="application/json")
+                        if types
+                        else None
+                    )
+                    gen_kwargs = {"model": model_name, "contents": prompt}
+                    if config:
+                        gen_kwargs["config"] = config
+
                     response = await asyncio.wait_for(
-                        asyncio.to_thread(client.models.generate_content, model=model_name, contents=prompt), 
+                        asyncio.to_thread(client.models.generate_content, **gen_kwargs), 
                         settings.gemini_timeout_seconds
                     )
                     raw = (response.text or "").replace("```json", "").replace("```", "").strip()
@@ -301,12 +307,27 @@ class GeminiReasoner:
                         parsed = json.loads(raw)
                     except json.JSONDecodeError:
                         parsed = {"analysis": raw}
-                    return {"status": "success", "model": model_name, **parsed}
+
+                    token_usage = {}
+                    if hasattr(response, "usage_metadata") and response.usage_metadata:
+                        token_usage = {
+                            "prompt_tokens": getattr(response.usage_metadata, "prompt_token_count", None),
+                            "completion_tokens": getattr(response.usage_metadata, "candidates_token_count", None),
+                            "total_tokens": getattr(response.usage_metadata, "total_token_count", None),
+                            "reported_by_provider": True,
+                        }
+
+                    return {
+                        "status": "success",
+                        "model": model_name,
+                        "token_usage": token_usage,
+                        **parsed
+                    }
                 except Exception as error:
                     last_error = error
                     code = self._error_code(error)
-                    # Non-retryable errors abort immediately to prevent wasteful loops
-                    if code in {"authentication_failed", "credentials_missing", "model_unavailable", "quota_exceeded"}:
+                    # Non-retryable errors abort immediately to prevent wasteful loops or charges
+                    if code in {"authentication_failed", "credentials_missing", "model_unavailable", "quota_exceeded", "billing_required"}:
                         if code == "model_unavailable" and model_name != models_to_try[-1]:
                             break  # Fallback to next model
                         return {"status": "error", "error_code": code, "model": model_name, "error_details": str(error)}

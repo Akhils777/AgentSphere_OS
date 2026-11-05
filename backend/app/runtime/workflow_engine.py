@@ -6,6 +6,7 @@ from ..agents.data_agent import DataIntelligenceAgent
 from ..agents.security_agent import SecurityComplianceAgent
 from ..agents.risk_agent import RiskAnalysisAgent
 from ..agents.report_agent import ReportGenerationAgent
+from ..agents.base import GeminiReasoner
 from ..memory.firestore_memory import memory_bank
 from ..models import now_iso
 from ..observability.logger import audit
@@ -61,7 +62,7 @@ class WorkflowEngine:
             return
 
         try:
-            available = [a for a in registry.list(status="approved") if a.get("agent_id") in AGENTS and a.get("enabled", True)]
+            available = [a for a in registry.list(status="approved") if a.get("enabled", True)]
             plan = await self.supervisor.plan(workflow["goal"], available)
         except Exception as e:
             workflow.update(
@@ -126,11 +127,25 @@ class WorkflowEngine:
                 if not agent_record or not agent_record.get("enabled", True):
                     raise PermissionError("agent_identity_unavailable")
 
-                resource = "analytics_data" if agent_id.startswith(("data-", "risk-")) else "policies" if agent_id.startswith("security-") else "reports"
+                if agent_id.startswith(("data-", "risk-", "esg-")):
+                    resource = "analytics_data"
+                elif agent_id.startswith("security-"):
+                    resource = "policies"
+                elif agent_id.startswith("report-"):
+                    resource = "reports"
+                else:
+                    perms = agent_record.get("permissions", {})
+                    resource = "analytics_data" if perms.get("analytics_data") else "policies" if perms.get("policies") else "reports"
+
                 authorize(agent_record, resource, "read", workflow_id)
 
-                if agent_id not in AGENTS:
-                    raise ValueError(f"agent_runtime_missing: {agent_id}")
+                if agent_id in AGENTS:
+                    agent_instance = AGENTS[agent_id]
+                else:
+                    agent_instance = GeminiReasoner(
+                        name=agent_record.get("name", agent_id),
+                        instruction=agent_record.get("description", "Dynamic specialist agent")
+                    )
 
                 step_context = {
                     "goal": workflow["goal"],
@@ -147,7 +162,7 @@ class WorkflowEngine:
 
                 while retries_done <= max_retries:
                     try:
-                        result = await AGENTS[agent_id].reason(step.get("title", workflow["goal"]), step_context)
+                        result = await agent_instance.reason(step.get("title", workflow["goal"]), step_context)
 
                         if isinstance(result, dict) and result.get("status") == "error":
                             err_code = result.get("error_code", "gemini_error")
